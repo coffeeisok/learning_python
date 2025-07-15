@@ -26,7 +26,9 @@
 * 从序列（列表、字符串、元组）中提取子序列；支持反向索引、步长操作
 `sequence[start:stop:step]`
 * 
-
+## `if __name__=='__main__':`
+* `"__name__"`是一个特殊变量，`"__main__"`是一个字符串，`"__name__"`单独运行时被python赋值为`"__main__"`，别的程序调用时，它被赋值为它所在程序的名称，它所在程序被当作一个模块被调用
+* **底层逻辑：** python 程序运行时，从代码的上到下逐行执行的，函数/类定义 本身不回被执行，只有被调用时才会执行。所以这行代码是一个普通的if语句，用它来防止意外调用（**入口保护**）
 ## 语句
 * del
 用于删除对象的引用或名称绑定
@@ -427,7 +429,173 @@ def f(s):
 * 用于标识迭代的完成，防止出现无限循环的情况
 
 
-# 异常
+# 异常（错误、调试、测试）
+## 错误
+[示例](code/Error_debug_test/error.py)
+### try
+    ```
+    try:
+        # “尝试”执行这一段代码
+    except ExceptionType1 as alias1:
+        # 如果 try 中抛出了 ExceptionType1，就执行这里
+    except (TypeA, TypeB) as alias2:
+        # 可以一次捕获多个异常类型
+    except ExceptionType3:
+        # 也可以不写 “as” 绑定变量，若不需要使用异常对象本身
+    else:
+        # 如果 try 没有抛出任何异常，就会进入这里
+    finally:
+        # 无论是否抛出、是否被捕获，最后都会执行这里
+    ```
+* `as`把捕获到的异常实例赋给后面的变量
+* Python的错误其实也是class，所有的错误类型都继承自`BaseException`，所以在使用`except`时需要注意的是，它不但捕获该类型的错误，还把其子类也“一网打尽”。比如：
+    ```
+    try:
+    foo()
+    except ValueError as e:
+        print('ValueError')
+    except UnicodeError as e:
+        print('UnicodeError')
+    ```
+    - 第二个`except`永远也捕获不到`UnicodeError`，因为`UnicodeError`是`ValueError`的子类，如果有，也被第一个`except`给捕获了。
+
+### 调用栈
+* 如果错误没有被捕获，它就会一直往上抛，最后被Python解释器捕获，打印一个错误信息，然后程序退出。
+
+## 调试
+[示例](code/Error_debug_test/debug.py)
+1. **断言（assert）**
+    * 凡事用`print()`来辅助的地方，都可以用断言来替代
+    * `assert`的意思是，表达式`n != 0`应该是`True`，否则按程序运行逻辑后面代码肯定会出错
+    * 若断言失败，assert本身就会抛出`AssertionError`：`AssertionError: n is zero!`
+    * 启动Python解释器时可以用`-O`参数来关闭`assert`，关闭后所有的`assert`语句当成`pass`看（大写字母O）
+1. **logging**
+    `logging.info('n = %d' % n)`
+    * logging不会抛出错误，而且可以输出到文件
+    * 日志等级：
+        - `DEBUG`（10）:详细信息，通常只在诊断问题时使用
+        - `INFO`（20）：常规运行信息（程序启动、配置完成）
+        - `WARNING`（30）：表示有潜在问题（使用了将被废弃的API）
+        - `ERROR`（40）：运行时错误，但程序还能继续
+        - `CRITICAL`（50）：严重错误，程序通常不能继续
+2. **pdb**
+
+* 程序以单步方式运行，可以随时查看运行状态
+
+# IO编程
+## 文件读写
+* `read()`一次读取文件的全部内容，文件太大可能会爆内存
+* `read(size)`每次最多读取size个字节的内容
+* `readline()`每次读取一行内容
+* `readlines()`每次读取所有内容并按行返回`list`
+[`read（）`示例](code/Error_debug_test/read.py)
+### 读文件
+* 标识符：
+    - `‘r’`读取文本文件
+    - `’rb‘`读取二进制文件（图片视频等）
+* 步骤：
+    1. 以读文件模式打开一个文件对象，使用Python内置的`open()`函数，传入文件名和标示符`f = open('/Users/michael/test.txt', 'r')`
+    2. 文件不存在，就会抛出`IOError`的错误
+    3. 调用`read()`方法`f.read()`，可以一次读取文件的全部内容，Python把内容读到内存，用一个str对象表示：`Hello,world!`
+    4. 最后一步是调用`close()`方法关闭文件：`f.close()`
+* 文件读写有可能产生`IOError`，后面的`f.close()`就不会调用。我们用`try ... finally`来保证无论是否出错都能正确地关闭文件
+    ```
+    try:
+        f = open('/path/to/file', 'r')
+        print(f.read())
+    finally:
+        if f:
+            f.close()
+    ```
+* `with`语句，自动调用`close()`方法，跟前面`try ... finally`是一样的，且不必调用`f.close()`
+    ```
+    with open('/path/to/file', 'r') as f:
+        printf(f.read())
+    ```
+* `encoding='编码类型'`：读取非UTF-8编码的文件，给open()函数传入`encoding`参数（例如`encoding='gbk'`）
+* 不规范的文件可能遇到`UnicodeDecodeError`，`open()`函数后接收一个`error`参数，表示遇到编码错误后如何处置`f = open('/Uses/michael/gbk.txt', 'r',encoding='gbk', errors='ignore')`
+
+### 写文件
+* `write()`
+* 标示符：
+    - `w`写文本文件。若文件已存在，会直接覆盖
+    - `wb`写二进制文件
+    - `a`追加（append）模式写入。追加到文件末尾
+* 调用`write()`后，务必要`f.close()`
+* 写文件时，OS不回立即把数据写入磁盘，而是放在内存缓存起来，空闲时再慢慢写入；调用`close()`时才会立即把没写入的写进磁盘
+
+## StringIO和BytesIO
+[具体示例](code/Error_debug_test/StringBytes_IO.py)
+### StirngIO
+* 在内存中读写`str`
+* 要把`str`写入`SringIO`，要创建一个`SringIO`，然后想文件一样写入即可
+* `getvalue()`用于获得写入后的`str`
+### BytesIO
+* 内存中读写`bytes`
+## 操作文件和目录
+[示例](code/Error_debug_test/file_menu.py)
+* `os.name`：`posix`说明系统是Linux、Unix或macOS，如果是`nt`，就是Windows系统
+* `os.uname()`：获取系统详细
+1. 环境变量
+    * 操作系统中定义的环境变量，全部保存在`os.environ`这个变量中
+    * `os.environ.get('key')`获取某个环境变量(`key`)的值
+2. 操作文件和目录
+## 序列化
+
+
+# 进程和线程
+* `join()`：让<u>主进程</u>（线程）等待<u>子进程</u>（线程）结束后再继续执行
+## 多进程
+### `fork()`系统调用
+* 普通函数调用一次，返回两次。因为操作系统把当前进程（称为父进程）复制了一份（称为子进程），然后，分别在父进程和子进程内返回
+* 子进程永远返回`0`，父进程返回子进程的ID。一个父进程可以`fork`出很多子进程，父进程只需要记下每个子进程的ID，子进程只需要调用`getpid()`就可以拿到父进程的ID
+* Python的`os`模块封装了常见的系统调用，其中就包括`fork`
+* 有了`fork`调用，一个进程在接到新任务时就可以复制出一个子进程来处理新任务（常见的Apache服务器就是由父进程监听端口，每当有新的http请求时，就fork出子进程来处理新的http请求）
+* Windows没有`fork`
+
+### multiprocessing
+* `multiprocessing`模块提供了一个`Process`类来代表一个进程对象
+* [启动子进程并等待其结束](code/Processes_Threads/MultiProcessing.py)
+* `process()`
+    ![](assets/17525720344694.jpg)
+
+### Pool
+* 若要启动大量的子进程，可以用进程池的方式批量创建子进程
+* [Pool线程池](code/Processes_Threads/Pool.py)
+* `Pool.appil_async`参数详解：
+    ```
+    result = Pool.apply_async(
+        func,         # 要在子进程中执行的可调用对象
+        args=(),      # 传给 func 的位置参数 tuple
+        kwds={},      # 传给 func 的关键字参数 dict
+        callback=None,        #（选）func 执行成功后，将其返回值传给 callback(result)
+        error_callback=None   #（选）func 抛异常后，将异常对象传给 error_callback(exc)
+    )
+    ```
+### 子进程
+* `subprocess`模块：非常方便启动一个子进程，然后控制其输入和输出
+* [在Python代码中运行命令`nslookup www.python.org`](code/Processes_Threads/subprocess.py)
+* `subprocess.call()`：`subprocess`模块里的一个**便利函数**
+    - 在操作系统层面创建一个新进程，执行你传入的命令，父进程阻塞等待，直到子进程结束；返回子进程的退出状态码（通常 0 表示成功，非 0 表示出错）
+
+    ```
+    subprocess.call(args,   #要执行的命令及参数列表。可以是字符串或序列：
+                    *,
+                    stdin=None,     #重定向子进程的标准输入，可以是 subprocess.PIPE、文件对象或 None（沿用父进程的输入）。
+                    stdout=None,    #重定向子进程的标准输出，常用 subprocess.PIPE 捕获输出，或指定文件写入；默认 None（打印到屏幕）
+                    stderr=None,    #重定向子进程的标准错误，行为同 stdout；默认 None。                            
+                    shell=False,    #是否通过 shell（如 /bin/sh 或 Windows CMD）来解析命令；True 可执行管道、通配符等 shell 功能
+                    timeout=None    #最长等待时间（秒），超时会抛出 subprocess.TimeoutExpired 异常
+                    )  
+    ```    
+
+### 进程间通信
+
+
+## 多线程
+## ThreadLocal
+## 进程
+
 
 
 # 爬虫
