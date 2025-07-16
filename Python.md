@@ -2,6 +2,7 @@
 先过一遍，再实操
 再用到哪个复习哪个（如此往复）
 最后学YOLOv8
+
 # 语法
 * `input()`读取键入
 * 转义字符：`\`
@@ -31,7 +32,7 @@
 * **底层逻辑：** python 程序运行时，从代码的上到下逐行执行的，函数/类定义 本身不回被执行，只有被调用时才会执行。所以这行代码是一个普通的if语句，用它来防止意外调用（**入口保护**）
 ## 语句
 * del
-用于删除对象的引用或名称绑定
+  用于删除对象的引用或名称绑定
    - `del x`删除变量`x`
    - `del lst[2]`删除列表中索引为2的元素
    - `del person["age"]`删除字典`person`中键`"age"`及其对应的值
@@ -219,7 +220,7 @@
             return x
         else:
             return -x
-    
+        
         print(my_abs(-99))
         ```
 2. **参数组合**（5种）：（按顺序必须是）必选参数、默认参数、可变参数`*args`、命名关键字参数、关键字参数`**kw`
@@ -236,7 +237,7 @@
         >>> nums = [1, 2, 3]
         >>> calc(*nums)
         14
-        ``` 
+        ```
 1. **关键字参数**：
     ```
     def person(name, age, **kw):
@@ -293,7 +294,7 @@
             x = x + 1
             return x
         return fn
-    
+        
         f = inc()
         print(f()) # 1
         print(f()) # 2
@@ -563,7 +564,7 @@ def f(s):
 * 若要启动大量的子进程，可以用进程池的方式批量创建子进程
 * [Pool线程池](code/Processes_Threads/Pool.py)
 * `Pool.appil_async`参数详解：
-    ```
+    ```python
     result = Pool.apply_async(
         func,         # 要在子进程中执行的可调用对象
         args=(),      # 传给 func 的位置参数 tuple
@@ -578,7 +579,7 @@ def f(s):
 * `subprocess.call()`：`subprocess`模块里的一个**便利函数**
     - 在操作系统层面创建一个新进程，执行你传入的命令，父进程阻塞等待，直到子进程结束；返回子进程的退出状态码（通常 0 表示成功，非 0 表示出错）
 
-    ```
+    ```python
     subprocess.call(args,   #要执行的命令及参数列表。可以是字符串或序列：
                     *,
                     stdin=None,     #重定向子进程的标准输入，可以是 subprocess.PIPE、文件对象或 None（沿用父进程的输入）。
@@ -587,12 +588,14 @@ def f(s):
                     shell=False,    #是否通过 shell（如 /bin/sh 或 Windows CMD）来解析命令；True 可执行管道、通配符等 shell 功能
                     timeout=None    #最长等待时间（秒），超时会抛出 subprocess.TimeoutExpired 异常
                     )  
-    ```    
+    ```
 
 ### 进程间通信
 
-
 ## 多线程
+
+
+
 ## ThreadLocal
 ## 进程
 
@@ -626,7 +629,7 @@ def f(s):
     `get_text()`提取标签中的文本内容
 5. [查找子标签和父标签](code/Spider/find_tags_parent_son.py)
     - 通过parent和children属性访问标签的父标签&子标签
-    ```
+    ```python
     #获取当前标签的父标签
     parent_tag = first_link.parent
     #获取当前标签的所有子标签
@@ -657,8 +660,7 @@ def f(s):
     **通用兄弟选择器 (~)**
     - `h2 ~ p`：选择h2后面的所有同级p元素 
     3. 在Scrapy中特殊用法：
-    
-
+   
 1. `select()`
     - 允许使用类似jQuery的选择器语法来查找标签
     ```
@@ -752,7 +754,7 @@ def f(s):
     * `ancestor`当前节点的所有祖先节点
     * `::`：轴分隔符
         - `轴名称::节点测试`->`self::node`选择当前节点本身，匹配任意类型的节点
-5.
+        5.
 -------
 
 * 选`a`标签
