@@ -266,6 +266,11 @@
 3. `int(参数)`：把参数转换成int型
 4. `print()`：默认输出换行；不需要换行：末尾加上`end=""`
 5. `enumweate([列表元素])`：把list变成索引-元素对
+6. `enumerate(对象,start=1)`便利列表或其他可迭代对象，同时获得索引。索引从1开始（默认是0）
+7. `getprevious()`返回当前元素的“前一个兄弟节点”
+8. `getattr(obj,name,default)`用于安全地获取对象的某个属性
+9. `pd.DataFrame()`Pandas中创建表格的类（创建一个Excel表格对象）
+10. `df.columns`Pandas的DataFrame的属性，查看或设置表的列名
 #### **高阶函数**
 1. `map(参数,Iterable)`：将传入的函数依次作用到列的每个元素，并把结果作为新的`Iterator`返回
     * `map()`传入的第一个参数是`f`（即函数对象本身）
