@@ -1,4 +1,4 @@
-学习思路
+ 学习思路
 先过一遍，再实操
 再用到哪个复习哪个（如此往复）
 最后学YOLOv8
@@ -30,7 +30,21 @@
 ## `if __name__=='__main__':`
 * `"__name__"`是一个特殊变量，`"__main__"`是一个字符串，`"__name__"`单独运行时被python赋值为`"__main__"`，别的程序调用时，它被赋值为它所在程序的名称，它所在程序被当作一个模块被调用
 * **底层逻辑：** python 程序运行时，从代码的上到下逐行执行的，函数/类定义 本身不回被执行，只有被调用时才会执行。所以这行代码是一个普通的if语句，用它来防止意外调用（**入口保护**）
+## 正则表达式
+
+* [常用符号截图01](assets/Regular_Expression_Symbols01.png)
+* [常用符号截图02](assets/Regular_Expression_Symbols02.png)
+* [示例代码](code/Regular_expression.py)
+
+* `re`模块使 Python 语言拥有全部的正则表达式功能。`import re`
+* `re.sub(pattern, repl, string, count=0, flags=0`：用`repl`替换`string` 
+  * `pattern`：正则表达式模式，用于匹配字符串中的内容
+  * **`count`**（可选）：最多替换的次数（默认 0 表示全部替换）
+  * **`flags`**（可选）：正则表达式标志（如 `re.IGNORECASE` 忽略大小写）
+  * [官方文档](https://docs.python.org/zh-cn/3/library/re.html#re.sub)
+
 ## 语句
+
 * del
   用于删除对象的引用或名称绑定
    - `del x`删除变量`x`
@@ -56,7 +70,16 @@
 
 1. append()
 
+
+
+# 方法
+
+* 特殊方法（魔法方法）：前后有两个下划线的方法。控制对象怎么回应python的内置行为,例如：`__iter__`
+
+
+
 # 关键字
+
 1. `del`
     * 用于删除对象的引用或名称绑定
 2. `raise`
@@ -82,7 +105,9 @@
 
 ### 2.String（字符串）
 * #### 用`''`或`""`括起来
+
 * [用法示例](code/base/string.py)
+
 * 函数
     - `ord()`：获取字符整数表示
     - `chr()`：把编码转换为对应的字符
@@ -90,10 +115,23 @@
         - 中文的ascii超范围会报错
     - `decode()`：把`bytes`->`str`
     - `len()`：计算`str`包含的字符数
-* 字符串格式化  
-    - 用`%`实现，按顺序一一对应：
+    
+    ###### 字符串格式化  
+    
+    ``````python
+    for idx, ent in enumerate(entries, start=1):
+    	f"{idx:02d}_{ent['safe']}"
+    ``````
+    
+    * `f`表示这是一个“格式化字符串”，它允许你在字符串内部用花括号 `{}` 嵌入 Python 表达式，并在运行时把它们的值插入进去
+        * `idx`：从当前条目的编号开始（对应`start`的1）
+        * `ent`：字典，它的键`'safe'`存着对处理过的表格标题
+        * `0`：用0做填充字符，`2`：输出宽度为2，`d`：十进制整数
+    
+    * 用`%`实现，按顺序一一对应：
         - `%s`字符串、`%d`整数、`%f`浮点数、`%x`十六进制数
-    - 格式化整数和浮点数还可以指定是否补0和整数与小数的位数
+    * 格式化整数和浮点数还可以指定是否补0和整数与小数的位数
+    
 * 其他
     * `+`连接运算符，`*`重复操作（要乘的次数）
     * 索引：`0`从头起始，`-1`从末尾开始（前闭后开）
@@ -137,15 +175,25 @@
 -------
 ### 3. list（列表）
 * [用法示例](code/base/list_and_tuple.py)
+
 * #### 写在`[]`之间，元素用`,`隔开
+
 * 有序对象的集合；随时添加删除其中的元素
+
 * 列表中元素类型可以不同；列表之间可以嵌套
+
 * 直接给对应索引赋值：把某个元素替换成别的元素
-* **方法：**
-    - `append('元素')`在末尾 添加元素（只能一条语句加一个元素）
-    - `insert(索引,'元素')`在指定位置插入元素（只能一条语句加一个元素）
-    - `pop()`删除末尾元素；`pop(i)`删除指定位置的元素
-    - `len()`求元素个数
+
+###### 方法：
+
+添加元素：
+
+* `lst.append(x)`：在**列表末尾插入一个对象`x`**，无论`x`是什么类型，都被带当作单个元素加入
+
+* `lst.extend(iter)`：在**列表末尾一次性添加一个可迭代对象的所有元素**，相当于多次`append`
+* `insert(索引,'元素')`在指定位置插入元素（只能一条语句加一个元素）
+* `pop()`删除末尾元素；`pop(i)`删除指定位置的元素
+* `len()`求元素个数
 
 ### 4.dict（字典）
 * [用法示例](code/base/dict.py)
@@ -208,6 +256,8 @@
 ## 条件控制
 * [用法示例](code/base/condition_control.py)
 * `if`
+  * **三元表达式** `A if 条件 else B`：条件为true执行A，否则为B
+  * 
 * `match...case`
 # 函数
 `*`：序列——把数据打包成序列（列表）；把序列解包成一个个元素
@@ -266,9 +316,10 @@
 3. `int(参数)`：把参数转换成int型
 4. `print()`：默认输出换行；不需要换行：末尾加上`end=""`
 5. `enumweate([列表元素])`：把list变成索引-元素对
-6. `enumerate(对象,start=1)`便利列表或其他可迭代对象，同时获得索引。索引从1开始（默认是0）
+6. `enumerate(iterable, start=0)`返回一个枚举对象（元组，包含计数值和通过迭代iterable获得的值）。[Python文档](https://docs.python.org/zh-cn/3/library/functions.html#enumerate)
 7. `getprevious()`返回当前元素的“前一个兄弟节点”
-8. `getattr(obj,name,default)`用于安全地获取对象的某个属性
+8. `getattr(obj,name,default)` 获取对象的属性值。[Python文档](https://docs.python.org/zh-cn/3/library/functions.html#getattr)
+   * `getattr(prev, 'text', '')`：`prev` 代表前一个元素；`'text'` 是要获取的属性名，也就是元素的文本内容；`''` 是默认值，当 `prev` 对象没有 `text` 属性时，就会返回这个默认的空字符串。
 9. `pd.DataFrame()`Pandas中创建表格的类（创建一个Excel表格对象）
 10. `df.columns`Pandas的DataFrame的属性，查看或设置表的列名
 #### **高阶函数**
@@ -361,7 +412,7 @@ def f(s):
 * 调用一个生成器函数，返回一个迭代器对象
 
 
-## 迭代器
+## 迭代器(Iterator)
 * 可直接用于`for`循环的数据类型：（集合数据类型）`list`、`tuple`、`dict`、`set`、`str`；`generator`（生成器和带`yield`的generator fiction）
 * 可以直接作用于`for`循环的对象统称为可迭代对象`Iterable`
 * 集合数据类型是`Iterable`,但不是`Iterator`，不过可以通过`iter()`函数获得一个Iterator对象。
@@ -372,10 +423,14 @@ def f(s):
 * 迭代器对象从集合的第一个元素开始访问，直到所有元素被访问完结束
 * 迭代器只能向前不能后退
 * 两个基本方法：`__iter__()`、`__next__()`
-### 创建一个迭代器  
+* 
+* 可迭代对象：Iterable
+
+#### 迭代器  
+
 1. `__iter__()`
     - 在对象初始化时执行
-    - 返回一个特殊的迭代器对象
+    - 返回迭代器本身，即`iter(self)`
 2. `__next__()`
     - 返回下一个迭代器对象
 
@@ -706,10 +761,9 @@ def f(s):
     ```
 
 ##### `re_first()`正则提取方法
-###### 什么是正则表达式？
 * 语法：`selector.re_first(正则表达式)`
 * 示例：
-    ```
+    ```python
     code = response.xpath("//td[contain(,.'区划代码')]/text()").re_first(r'(\d{6})')
     ```
     - `r'(\d{6})'`：
@@ -808,4 +862,81 @@ def f(s):
 2. `position()`节点位置
 3. `last()`最后一个节点
 
-    * 
+
+
+
+# Panda
+
+## DataFrame
+
+* `DataFrame` 是 Pandas 提供的二维表格数据结构，可以类比为 Excel 表格或数据库中的一张表。
+  - 行（row）：代表一个个记录或观测值。
+  - 列（column）：代表一个个字段或变量名。
+  - 可以有行索引（index）和列索引（columns）。
+    - 例：`pd.DataFrame(rows)`把`rows`这个二维列表转成一个`DataFrame`
+
+
+
+### `DataFrame.drop`
+
+`DataFrame.drop(labels, axis, inplace, errors)`：删除行或列
+
+* `labels`：要删除的行或列标签，可以是单个标签（字符串/数字）、列表或索引对象。
+* `axis`：指定删除方向
+  - `axis=0`（或 `'index'`）→ 删除行
+  - `axis=1`（或 `'columns'`）→ 删除列
+* `inplace`：默认为 `False`
+  - `False` → 返回一个新的 `DataFrame`
+  - `True`  → 在原对象上直接修改，返回 `None`
+* `errors`：默认为 `'raise'`；
+  - `'raise'` → 如果指定的标签不存在，抛出错误
+  - `'ignore'` → 忽略不存在的标签
+
+### `DataFrame.reset_index`
+
+`DataFrame.reset_index(drop, inplace)`：重置行索引，将原索引转为普通列或直接丢弃，按默认顺序重新编号（0,1,2…）。
+
+* `drop`：默认为 `False`；
+
+  - `False` → 将原索引添加到结果表作为新列，列名由 `index` 或原索引名称决定
+  - `True`  → 丢弃原索引，不保留为列
+
+* `inplace`：默认为 `False`
+
+  - `False` → 返回新对象
+
+  - `True`  → 在原对象上修改
+
+
+
+## `iloc`
+
+* `iloc` 是 Pandas 中按**整数位置**索引（integer-location based indexing）的访问器
+* `df.iloc[0]`
+  * 方括号里的 `0` 表示“第 0 行”，也就是DataFrame的第一行
+  * 返回一个**Series**（序列），其**索引**是DataFrame的列名，**值**是这一行对应列下的单元格内容
+
+## `tolist()`
+
+* 在 Pandas 里，`tolist()` 可用于将 Series 或 DataFrame 的列转换为列表。(把值**按顺序**取出，生成一个Python`list`，索引信息会被丢弃，只保留**值**本身)
+
+  
+
+
+
+# openpyxl
+
+## workbook
+
+`workbok.active`：获取或设置当前“活动”的工作表（`Worksheet`）对象
+
+1. **默认活动表**
+
+   - 当你新建一个 `Workbook()` 时，`openpyxl` 会自动创建一个默认的工作表（通常名为 “Sheet”）。
+
+   - 这个默认工作表就是 `wb.active` 所指向的表。
+
+1. `wb.active`直接对默认表进行读写操作（如：写入数据、设置单元格样式）
+2. 
+
+2. 
