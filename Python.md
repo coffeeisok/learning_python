@@ -23,6 +23,7 @@
     ```
 * `import`导入相应模块
 * `from A import B`从模块A中导入函数B
+* `_`：名字前面加一个下划线 `_` 有**特殊含义**：它表示这个属性或方法是“**内部使用的（private-like）**”。
 ## 切片`[:]`（前闭后开）
 * 从序列（列表、字符串、元组）中提取子序列；支持反向索引、步长操作
 `sequence[start:stop:step]`
@@ -525,6 +526,7 @@ def f(s):
 
 ## 调试
 [示例](code/Error_debug_test/debug.py)
+
 1. **断言（assert）**
     * 凡事用`print()`来辅助的地方，都可以用断言来替代
     * `assert`的意思是，表达式`n != 0`应该是`True`，否则按程序运行逻辑后面代码肯定会出错
@@ -731,13 +733,13 @@ def f(s):
     links = soup.select('a[href]')
     ```
 
-## Scrapy库
+## Scrapy框架
 * 专门用于抓去网页数据并提取信息。常被用于数据挖掘、信息处理、存储历史数据等应用
 * 全功能的爬虫框架，高度的可扩展性、灵活性，使用复杂和大规模的网页抓取任务
 * [Scrapy架构图](assets/Scrapy架构图.png)
 * Scrapy 的工作基于以下几个核心组件：
     - **Spider**：爬虫类，用于定义如何从网页中提取数据以及如何跟踪网页的链接。
-    - **Item**：用来定义和存储抓取的数据。相当于数据模型。
+    - **`Item`类：**用来定义和存储要抓取的数据段。相当于数据模型。（继承自`scrapy.Item`）
     - **Pipeline**：用于处理抓取到的数据，常用于清洗、存储数据等操作。
     - **Middleware**：用来处理请求和响应，可以用于设置代理、处理 cookies、用户代理等。
     - **Settings**：用来配置 Scrapy 项目的各项设置，如请求延迟、并发请求数等。
@@ -745,7 +747,7 @@ def f(s):
 
 #### Scrapy方法 
 * 结构
-    ```
+    ```plaintext
     GPT_spider_code/                 ← 项目根目录，包含 scrapy.cfg
     ├── scrapy.cfg                   ← 指定 settings 模块路径
     ├── GPT_spider_code/            ← 项目包（包名和根文件夹同名）
@@ -760,7 +762,10 @@ def f(s):
     
     ```
 
+* Scrapy 要求项目根目录（含`scrapy.cfg`）下必须有一个 **与项目名同名的 Python 包**（即一个包含`__init__.py`的目录），用于组织`settings.py`、`items.py`等核心文件。
+
 ##### `re_first()`正则提取方法
+
 * 语法：`selector.re_first(正则表达式)`
 * 示例：
     ```python
@@ -771,28 +776,72 @@ def f(s):
         - `\d`匹配数字（0～9）
         - `{6}`匹配6次
         - `()`捕获分组，值返回括号内的内容
+##### `yield`
+
 ### `response`
-    * 是Scrapy封装过的一个对象：
-    - `response.test`拿到网页源码（字符串）
-    - `response.url`当前这个网页的URL
-    - `response.xpath()`用XPath抓页面里面的元素（Scrapy推荐）
-    - `response.css()`用CSS选择器选元素
-    - `response.follow()`狗则哦下一个请求（像`.get()`或`.post()`）
-### XPath
+
+* **`response.xpath()`** 是一个核心方法，用于从 HTTP 响应中提取数据。这里的 **`response`** 是一个特殊对象，代表爬虫获取到的网页内容
+* **`response.text`**：网页的 HTML 文本（字符串类型）。
+* **`response.body`**：网页的原始二进制内容。
+* **`response.status`**：HTTP 状态码（如 200、404）。
+* **`response.url`**：请求的 URL。
+* **`response.headers`**：响应头信息。
+
+- `response.url`当前这个网页的URL
+- `response.xpath()`用XPath抓页面里面的元素（Scrapy推荐）
+- `response.css()`用CSS选择器选元素
+- **`response.follow()`**用于**跟进链接、创建新请求**的核心方法（在网页中发现新的链接需要继续爬取时使用）
+
+  - ``````python
+    response.follow(url, callback=None, meta=None)	#常用参数
+    ``````
+
+  - `url`：目标 URL（可以是相对路径或绝对路径）。
+
+  - `callback`：回调函数（处理新响应的函数名，默认为 `None`）。
+
+  - `meta`：传递额外数据到回调函数。
+
+### `XPath`
 #### 基础概念
-  节点类型 | 说明     ｜    HTML示例 |
-- 元素节点：HTML标签，`<div>`,`<table>`
-- 属性节点：标签内的属性，`href="page.html"`
-- 文本节点：标签内的文本内容，`潍坊市`
-- 文档节点：整个文档，整个HTML文档
+
+* 查询语言，用于定位和提取文档中的特定元素。
+* XPath 将 XML/HTML 文档视为节点树，主要节点类型有：
+  - 元素节点：HTML标签，`<div>`,`<table>`
+  - 属性节点：标签内的属性，`href="page.html"`
+  - 文本节点：标签内的文本内容，`潍坊市`
+  - 文档节点：整个文档，整个HTML文档
+
 #### 核心语法
 1. 路径表达式
     * `nodename`选择所有该名称节点
-    * `/`从根结点开始选择`/html/body/div`
-    * `//`选择任意层级节点
+    
+    * `/`从根结点开始选择（绝对路径） `/html/body/div`
+    
+    * `//`选择任意层级节点（相对路径）
+    
     * `.`当前节点
+    
     * `..`父节点
+    
     * `@`选择属性
+    
+    * 具体实例
+      * ```html
+        <div class="container">
+            <h1 class="title">Hello, <span>XPath</span> World!</h1>
+            <div class="nested">
+                <p>嵌套的段落</p>
+            </div>
+            <p>直接子段落</p>
+        </div>
+        ```
+    
+      * ```python
+        //div[@class="container"]/p  # 选择 div[@class="container"] 下的直接子 p 标签
+        //div[@class="container"]//p  # 选择 div[@class="container"] 下任意层级的 p 标签
+        ```
+    
 2. 谓语
     * 用于定位特定节点
     ```
@@ -801,10 +850,12 @@ def f(s):
     //a[@href]               # 有href属性的a标签
     //div[@class='header']   # class为header的div
     ```
+    
 3. 通配符
     * `*`匹配任意元素节点
     * `@*`匹配任意属性
     * `node()`匹配任意类型节点
+    
 4. 轴
     * `child`当前节点的字节点
     * `parent`当前节点的父节点
@@ -820,7 +871,8 @@ def f(s):
     * `/a`：从根节点（html）的直接子节点找a标签（几乎找不到）
      * `//a`：从根节点开始，查找所有后代节点中所有的a标签，不管a在几层嵌套里。（最常用也最靠谱的写法）
      * `.//a`：表示从当前节点开始，查找所有后代的a标签（用已经定位到某个节点，然后找它下面所有的a）
- * `getall()`：拿到所有匹配的结果，返回一个字符串列表，每个元素是一个href链接。
+    
+    
 #### XPath函数
 **字符串函数**
 1. `contains()`内容包含匹配函数
@@ -861,6 +913,65 @@ def f(s):
 1. `count()`节点数量
 2. `position()`节点位置
 3. `last()`最后一个节点
+
+
+
+### `css`
+
+## 方法
+
+### `.getall()`
+
+* **获取所有匹配项的文本内容，并返回一个字符串列表**。用于提取 XPath 或 CSS 选择器匹配结果的核心方法。
+
+
+
+
+
+
+
+
+
+
+
+------
+
+
+
+# Word&XML
+
+### word文档的本质是XML
+
+* Word 文档（`.docx`）实际上是一个压缩文件，内部包含多个 XML 文件，用于存储文本、表格、样式等内容。例如：
+  * `document.xml`：存储文档的主要内容
+  * `styles.xml`：存储文档的样式信息
+  * 其他 XML 文件存储图片、关系等
+
+### XML结构与遍历
+
+* Word文档的XML结构类似于：
+
+``````xml
+<w:document>
+  <w:body>
+    <w:p>标题段落1</w:p>
+    <w:p>标题段落2</w:p>
+    <w:tbl> <!-- 表格开始 -->
+      ...
+    </w:tbl> <!-- 表格结束 -->
+    <w:p>备注段落1</w:p>
+    <w:p>备注段落2</w:p>
+  </w:body>
+</w:document>
+``````
+
+
+
+
+
+
+
+------
 
 
 
@@ -940,3 +1051,9 @@ def f(s):
 2. 
 
 2. 
+
+# os
+
+## path
+
+`os.path.dirname()`从文件路径中，提取**目录路径**
