@@ -243,15 +243,18 @@
 
 ## 循环
 * for 循环
-    ```
+    ```python
     for item in iterable:
         # 循环主体
     else:
         # 循环结束后执行的代码
+        
+    for _, row in gdf.iterrows():  # 注意这里使用了下划线 _
     ```
-    - 
+    - **`_`**: 约定俗成的变量名，表示"不需要使用的值"
+      - 这里表示忽略索引值（index），因为我们只需要行数据
 * while 循环
-    ```
+    ```python
     while <expr>:
         <statement(s)>
     else:
@@ -1083,3 +1086,39 @@ def f(s):
 ## path
 
 `os.path.dirname()`从文件路径中，提取**目录路径**
+
+
+
+# 数据库
+
+## 方法
+
+##### `commit()`方法
+
+* `connection_object.commit()`：用于**永久保存事务中的更改**，核心语句，连接对象的方法，无参数
+* **核心作用**
+  1. **提交事务**：将当前事务中的所有 SQL 操作（INSERT/UPDATE/DELETE）永久写入数据库
+  2. **持久化数据**：确保内存中的修改真正保存到磁盘
+  3. **结束事务**：提交后当前事务结束，新操作将属于新事务
+
+* 使用场景：
+
+* | 操作类型      | 是否需要commit |
+  | ------------- | -------------- |
+  | SELECT 查询   | ❌ 不需要       |
+  | INSERT/UPDATE | ✅ 必须         |
+  | DELETE/DROP   | ✅ 必须         |
+  | CREATE TABLE  | ✅ 必须         |
+
+##### `execute()`方法
+
+* `cur.execute()` 是 <u>Cursor 对象的核心方法</u>，用于执行 SQL 语句。
+
+* 语法解析：
+
+  * ```python
+    cursor.execute(operation, parameters=None, /)
+    ```
+
+    * `operation`: SQL 语句字符串（必填）
+    * `parameters`: SQL 的参数值（元组/列表/字典，可选）
