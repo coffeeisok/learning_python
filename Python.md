@@ -85,10 +85,16 @@
 
 1. `del`
     * 用于删除对象的引用或名称绑定
+
 2. `raise`
     * 手动触发异常
+
 3. `yield`
     - 用于创建生成器，定义生成器函数
+
+    
+
+4. 
 # Python基础
 ## 数据类型
 
@@ -202,31 +208,61 @@
 * `len()`求元素个数
 
 ### 4.dict（字典）
+
+#### 基本语法
+
 * [用法示例](code/base/dict.py)
-* #### 用`{key:value}`括起来
+
+* **用`{key:value}`括起来**
+
 * `key`是**不可变对象**
+
 * 无序的对象（键`key`:值`value`）集合
+
 * 元素通过键`key`存取，`key`是唯一的
+
 * `key`不存在就会报错
-    - 用`in`判断
-        ```
-        >>> 'Thomas' in d
-        False
-        ```
-    - 用`get()`，不存在返回None或自己指定的value
-        ```
-        >>> d.get('Thomas')
-        >>> d.get('Thomas', -1)
-        -1
-        ```
-        - 注：返回None的时候Python的交互环境不显示结果。
+
+  - 用`in`判断
+
+    ```
+    >>> 'Thomas' in d
+    False
+    ```
+
+  - 用`get()`，不存在返回None或自己指定的value
+
+    ```
+    >>> d.get('Thomas')
+    >>> d.get('Thomas', -1)
+    -1
+    ```
+
+    - 注：返回None的时候Python的交互环境不显示结果。
+
+#### 内置方法
+
+* `get()`
+  * `字典.get(键, 默认值)`
+  * **作用：返回<u>指定键</u>的<u>值</u>**
+    * 当<u>键</u>存在时返回对应的<u>值</u>，当键不存在时返回预设的默认值（避免直接用 dict[key] 导致的报错）
+  * 
+* 
 
 ### 5.tuple（元组）
+
+#### 写在`()`中，元素之间用`,`隔开
+
 * [用法示例](code/base/list_and_tuple.py)
-* #### 写在`()`中，元素之间用`,`隔开
+
+  #### 
+
 * 一旦初始化便不可修改
+
 * 元素类型可以不同
+
 * “可变”元组：实际上可变的是其内部的其他数据类型（例如：列表）
+
 * 元组之间可以用`+`、`+=`和`*`号进行运算
 
 
@@ -1017,6 +1053,19 @@ def f(s):
 
 
 
+### `.interrows()`
+
+* 是 DataFrame/GeoDataFrame **用于逐行遍历数据**的方法
+* **核心作用：**是将表格中的每一行数据转换为可操作的对象，方便对单行数据进行处理（如提取字段、计算、插入数据库等）
+* 要配合循环使用：**`for index, row in df.iterrows():`**
+  * **<u>返回值：</u>**每次循环返回一个元组**`(index, row)`**
+    - **`index`：**行索引（默认是从 0 开始的整数，也可能是自定义索引，如字符串、日期等）。
+    - **`row`：**`pandas.Series` 对象，存储当前行的所有数据，可通过 **列名** 访问具体字段（如 `row["name"]` 或 `row.name`）。
+
+------
+
+
+
 ### `DataFrame.drop`
 
 `DataFrame.drop(labels, axis, inplace, errors)`：删除行或列
@@ -1091,6 +1140,8 @@ def f(s):
 
 # 数据库
 
+
+
 ## 方法
 
 ##### `commit()`方法
@@ -1112,7 +1163,23 @@ def f(s):
 
 ##### `execute()`方法
 
-* `cur.execute()` 是 <u>Cursor 对象的核心方法</u>，用于执行 SQL 语句。
+* `cur.execute(sql,param)` 是 <u>Cursor 对象的核心方法</u>，用于执行 SQL 语句。
+
+* 前提补充：
+
+  * ```python
+    conn = pymysql.connect(host='localhost', user='root', db='Weifang', charset='utf8mb4')
+    cur = conn.cursor() # python指针
+    
+    SQL_INSERT_poi = """
+      INSERT INTO poi 
+        (name,category,tel,source,region_adcode,geom)
+      VALUES (
+        %s,%s,%s,%s,%s,
+        ST_SRID(POINT(%s,%s),4326)
+      )
+    """
+    ```
 
 * 语法解析：
 
@@ -1120,5 +1187,22 @@ def f(s):
     cursor.execute(operation, parameters=None, /)
     ```
 
-    * `operation`: SQL 语句字符串（必填）
-    * `parameters`: SQL 的参数值（元组/列表/字典，可选）
+    * `operation`: SQL 语句字符串（增删改查等）（必填）
+    * `parameters`: SQL 的参数值（元组/列表/字典），针对前面定义的sql语句中的占位符，一一对应，予以赋值（可选）
+
+## 空间数据库
+
+### `ST_Contains`
+
+* `ST_Contains` 是 **空间数据库（如 MySQL、PostgreSQL+PostGIS 等）提供的核心空间函数**，是空间分析中 “包含关系” 判断的基础工具
+
+* ```mysql
+  ST_Contains(几何对象A, 几何对象B)
+  ```
+
+  * 作用：用于判断 **几何对象A**是否完全包含**几何对象B**
+  * 返回值：
+    - `1`（真）：A 完全包含 B；
+    - `0`（假）：A 不包含 B；
+    - `NULL`：如果 A 或 B 为无效几何。
+
